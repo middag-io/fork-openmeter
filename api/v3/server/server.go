@@ -27,6 +27,7 @@ import (
 	eventshandler "github.com/openmeterio/openmeter/api/v3/handlers/events"
 	featurecosthandler "github.com/openmeterio/openmeter/api/v3/handlers/featurecost"
 	featureshandler "github.com/openmeterio/openmeter/api/v3/handlers/features"
+	governancehandler "github.com/openmeterio/openmeter/api/v3/handlers/governance"
 	llmcosthandler "github.com/openmeterio/openmeter/api/v3/handlers/llmcost"
 	metershandler "github.com/openmeterio/openmeter/api/v3/handlers/meters"
 	planshandler "github.com/openmeterio/openmeter/api/v3/handlers/plans"
@@ -235,6 +236,7 @@ type Server struct {
 	customersBillingHandler     customersbillinghandler.Handler
 	customersCreditsHandler     customerscreditshandler.Handler
 	customersEntitlementHandler customersentitlementhandler.Handler
+	governanceHandler           governancehandler.Handler
 	metersHandler               metershandler.Handler
 	subscriptionsHandler        subscriptionshandler.Handler
 	subscriptionAddonsHandler   subscriptionaddonshandler.Handler
@@ -315,6 +317,7 @@ func NewServer(config *Config) (*Server, error) {
 	}
 
 	featuresH := featureshandler.New(resolveNamespace, config.FeatureConnector, config.MeterService, config.LLMCostService, httptransport.WithErrorHandler(config.ErrorHandler))
+	governanceH := governancehandler.New(resolveNamespace, config.CustomerService, config.EntitlementService, config.FeatureConnector, httptransport.WithErrorHandler(config.ErrorHandler))
 
 	var llmcostH llmcosthandler.Handler
 	if config.LLMCostService != nil {
@@ -348,6 +351,7 @@ func NewServer(config *Config) (*Server, error) {
 		currenciesHandler:           currenciesHandler,
 		featuresHandler:             featuresH,
 		featureCostHandler:          featureCostH,
+		governanceHandler:           governanceH,
 	}, nil
 }
 
